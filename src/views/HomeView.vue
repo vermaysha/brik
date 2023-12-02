@@ -9,17 +9,17 @@
       <q-page-container>
         <q-page class="q-pa-md">
           <div class="q-my-md">
-            <q-input v-model="search" filled type="search" placeholder="Search by Title...">
+            <q-input v-model="keyword" @update:model-value="searchByKey" filled type="search" placeholder="Search by Title...">
               <template v-slot:append>
                 <q-icon name="search"></q-icon>
               </template>
             </q-input>
           </div>
-          <div v-for="n in 3" :key="n" class="col col-md-8 q-my-sm" style="border: solid 1px #333; border-radius: 15px;">
+          <div v-for="movie in data" :key="movie.title" class="col col-md-8 q-my-sm" style="border: solid 1px #333; border-radius: 15px;">
                 <div class="q-pa-md">
-                  <div class="text-h6 text-bold">{{title}}</div>
-                  <div class="q-my-sm">{{ director }}</div>
-                  <div class="text-right">{{ genre }}</div>
+                  <div class="text-h6 text-bold">{{movie.title}}</div>
+                  <div class="q-my-sm">{{ movie.director }}</div>
+                  <div class="text-right">{{ movie.genre }}</div>
                 </div>
           </div>
           <router-link to="/add" class="absolute-bottom-right q-mr-md">
@@ -33,17 +33,21 @@
   </div>
 </template>
 <script>
+import { useMoviesStore } from '../stores/movie'
+import { ref } from 'vue'
 export default {
-  data () {
-    return {
-      search: null
-    }
-  },
   setup () {
+    const store = useMoviesStore();
+    const keyword = ref('');
+    const data = ref(JSON.parse(JSON.stringify(store.movies)));
+    const searchByKey = () => {
+      data.value = store.movies.filter((movie) => movie.title.toLowerCase().includes(keyword.value.toLowerCase()));
+    }
     return {
-      title: 'Power Ranger',
-      director: 'Dean Israelite',
-      genre: 'Action / Sci-Fi'
+      store,
+      keyword,
+      data,
+      searchByKey,
     }
   }
 }
