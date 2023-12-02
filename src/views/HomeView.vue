@@ -15,8 +15,8 @@
               </template>
             </q-input>
           </div>
-          <div v-for="movie in data" :key="movie.title" class="col col-md-8 q-my-sm" style="border: solid 1px #333; border-radius: 15px;">
-                <div class="q-pa-md">
+          <div v-for="[i, movie] of data.entries()" :key="i" class="col col-md-8 q-my-sm" style="border: solid 1px #333; border-radius: 15px;">
+                <div class="q-pa-md" @click="edit(i)">
                   <div class="text-h6 text-bold">{{movie.title}}</div>
                   <div class="q-my-sm">{{ movie.director }}</div>
                   <div class="text-right">{{ movie.genre }}</div>
@@ -34,16 +34,23 @@
 </template>
 <script>
 import { useMoviesStore } from '../stores/movie'
+import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 export default {
   setup () {
     const store = useMoviesStore();
+    const router = useRouter();
     const keyword = ref('');
     const data = ref(JSON.parse(JSON.stringify(store.movies)));
     const searchByKey = () => {
       data.value = store.movies.filter((movie) => movie.title.toLowerCase().includes(keyword.value.toLowerCase()));
     }
+    const edit = (i) => {
+      router.push({name: 'edit', params: {id: i}})
+    }
+
     return {
+      edit,
       store,
       keyword,
       data,
